@@ -1,19 +1,28 @@
+// FILE: ~/taskmaster/src/app/layout.tsx
+// Root layout — wraps the entire application with SessionProvider.
+
 import type { Metadata } from "next";
 import "./globals.css";
+import { SessionProvider } from "next-auth/react";
+import { auth } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Taskmaster",
   description: "Your personal productivity dashboard",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <SessionProvider session={session}>{children}</SessionProvider>
+      </body>
     </html>
   );
 }
