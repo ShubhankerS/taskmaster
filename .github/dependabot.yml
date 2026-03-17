@@ -1,0 +1,27 @@
+version: 2
+updates:
+  # npm dependencies
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    groups:
+      # Group all dev deps into one PR so CI isn't flooded
+      dev-dependencies:
+        dependency-type: development
+      # Production deps get individual PRs so breakages are isolated
+      production-dependencies:
+        dependency-type: production
+    ignore:
+      # next-auth v5 is still in beta — don't auto-bump until stable
+      - dependency-name: next-auth
+        update-types: [version-update:semver-major]
+
+  # Keep GitHub Actions themselves up to date
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
