@@ -37,7 +37,7 @@ jobs:
       AUTH_SECRET: ci-dummy-secret-32-chars-minimum!!
       AUTH_GITHUB_ID: dummy-github-id
       AUTH_GITHUB_SECRET: dummy-github-secret
-      NEXTAUTH_URL: https://taskmaster.shubh-lab.xyz
+      NEXTAUTH_URL: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
 
