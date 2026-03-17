@@ -1418,13 +1418,6 @@ function KanbanColumn({
               </p>
             )}
 
-            {/* Add Big Idea button at bottom */}
-            <button
-              onClick={() => onAddBigIdea(column.id)}
-              className="w-full mt-2 py-2 rounded-xl border border-gray-700 text-xs text-gray-500 hover:text-gray-300 hover:border-gray-600 hover:bg-gray-800/50 transition-colors"
-            >
-              + Add Big Idea
-            </button>
           </div>
         )}
       </Droppable>
