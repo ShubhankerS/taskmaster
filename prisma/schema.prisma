@@ -118,6 +118,8 @@ model Task {
   tags      TaskTag[]
 
   // Subtask self-relation (Small Ideas)
+  order        Int          @default(0)
+
   parentTask Task?  @relation("SubTasks", fields: [parentTaskId], references: [id], onDelete: Cascade)
   subtasks   Task[] @relation("SubTasks")
 

@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
         ...(status ? { status } : {}),
       },
       include: taskInclude,
-      orderBy: [{ createdAt: "desc" }],
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
       take: limit,
       ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
     });
