@@ -7,6 +7,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   DragDropContext,
   Droppable,
@@ -41,6 +42,14 @@ const STATUS_BORDER_COLOR: Record<TaskStatus, string> = {
   TODO:        "border-l-blue-500",
   IN_PROGRESS: "border-l-yellow-500",
   DONE:        "border-l-green-500",
+};
+
+const STATUS_HEX: Record<TaskStatus, string> = {
+  WILD_IDEA:   "#a855f7",
+  BACKLOG:     "#6b7280",
+  TODO:        "#3b82f6",
+  IN_PROGRESS: "#eab308",
+  DONE:        "#22c55e",
 };
 
 const TAG_PALETTE = [
@@ -242,11 +251,13 @@ function TagSelector({
 
 function SmallIdeasSection({
   task,
+  parentStatus,
   onToggle,
   onDelete,
   onAdd,
 }: {
   task: Task;
+  parentStatus: TaskStatus;
   onToggle: (smallId: string, currentStatus: TaskStatus, e: React.MouseEvent) => void;
   onDelete: (smallId: string, e: React.MouseEvent) => void;
   onAdd: (title: string) => void;
@@ -255,9 +266,11 @@ function SmallIdeasSection({
   const totalSmall = smallIdeas.length;
   const doneSmall = smallIdeas.filter((s) => s.status === "DONE").length;
   const allSmallDone = totalSmall > 0 && doneSmall === totalSmall;
+  const accentHex = STATUS_HEX[parentStatus];
 
   const [collapsed, setCollapsed] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const [showInput, setShowInput] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [adding, setAdding] = useState(false);
 
@@ -266,12 +279,18 @@ function SmallIdeasSection({
   const hiddenCount = smallIdeas.length - VISIBLE_LIMIT;
 
   async function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Escape") {
+      setNewTitle("");
+      setShowInput(false);
+      return;
+    }
     if (e.key === "Enter" && newTitle.trim()) {
       e.preventDefault();
       setAdding(true);
       try {
         await onAdd(newTitle.trim());
         setNewTitle("");
+        setShowInput(false);
       } finally {
         setAdding(false);
       }
@@ -310,11 +329,14 @@ function SmallIdeasSection({
               {visibleIdeas.map((si) => (
                 <div
                   key={si.id}
-                  className={`flex items-center gap-2 rounded-lg px-2.5 py-1.5 border transition-colors ${
-                    si.status === "DONE"
-                      ? "bg-gray-800/30 border-gray-700/50"
-                      : "bg-gray-800 border-gray-700"
-                  }`}
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 border transition-colors"
+                  style={si.status === "DONE" ? {
+                    backgroundColor: accentHex + "10",
+                    borderColor: accentHex + "30",
+                  } : {
+                    backgroundColor: accentHex + "18",
+                    borderColor: accentHex + "50",
+                  }}
                 >
                   {/* Checkbox */}
                   <button
@@ -377,16 +399,30 @@ function SmallIdeasSection({
           )}
 
           {/* Inline add */}
-          <input
-            type="text"
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onClick={(e) => e.stopPropagation()}
-            disabled={adding}
-            placeholder="+ Add small idea…"
-            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50"
-          />
+          {showInput ? (
+            <input
+              autoFocus
+              type="text"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onBlur={() => { if (!newTitle.trim()) setShowInput(false); }}
+              onClick={(e) => e.stopPropagation()}
+              disabled={adding}
+              placeholder="Add small idea… (Enter)"
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:border-transparent transition-colors disabled:opacity-50"
+              style={{ "--tw-ring-color": accentHex } as React.CSSProperties}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setShowInput(true); }}
+              className="text-white/25 hover:text-white/60 text-base leading-none transition-colors px-0.5"
+              title="Add small idea"
+            >
+              +
+            </button>
+          )}
         </>
       )}
     </div>
@@ -1182,20 +1218,22 @@ function BigIdeaCard({
 
   return (
     <Draggable draggableId={task.id} index={index} isDragDisabled={isFlipped}>
-      {(provided, snapshot) => (
-        // Outer wrapper: perspective container + drag root
+      {(provided, snapshot) => {
+        const card = (
+        // Outer wrapper: drag root
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
           style={{
             ...provided.draggableProps.style,
             userSelect: "none",
-            perspective: "1000px",
             height: `${wrapperHeight}px`,
             minHeight: `${wrapperHeight}px`,
           }}
           className="relative"
         >
+          {/* Perspective wrapper — separate from drag root so dnd transform is clean 2D */}
+          <div style={{ perspective: "1000px", width: "100%", height: "100%" }}>
           {/* Inner flip container */}
           <div
             style={{
@@ -1218,23 +1256,14 @@ function BigIdeaCard({
                 backfaceVisibility: "hidden",
                 WebkitBackfaceVisibility: "hidden",
               }}
+              {...provided.dragHandleProps}
               onClick={onFlip}
-              className={`bg-gray-900 border border-gray-800 rounded-xl p-3.5 border-l-4 ${borderColor} cursor-pointer group transition-colors ${
+              className={`bg-gray-900 border border-gray-800 rounded-xl p-3.5 border-l-4 ${borderColor} cursor-grab active:cursor-grabbing group transition-colors ${
                 snapshot.isDragging
                   ? "shadow-lg opacity-90"
                   : ""
               }`}
             >
-              {/* Drag grip — only visible on front, acts as drag handle */}
-              <div
-                {...provided.dragHandleProps}
-                onClick={(e) => e.stopPropagation()}
-                className="absolute top-2 left-2 text-white/20 hover:text-white/50 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity select-none text-xs leading-none"
-                title="Drag to reorder"
-                style={{ touchAction: "none" }}
-              >
-                ⠿
-              </div>
 
               {/* Header row */}
               <div className="flex items-start justify-between gap-2 mb-1 pl-4">
@@ -1290,6 +1319,7 @@ function BigIdeaCard({
               {/* Small Ideas section */}
               <SmallIdeasSection
                 task={task}
+                parentStatus={task.status}
                 onToggle={handleToggleSmallIdea}
                 onDelete={handleDeleteSmallIdea}
                 onAdd={handleAddSmallIdea}
@@ -1304,8 +1334,16 @@ function BigIdeaCard({
               onDeleted={onUnflip}
             />
           </div>
+          </div>
         </div>
-      )}
+        );
+        // Portal the card to document.body while dragging so it escapes the
+        // react-grid-layout transform context (transforms create a new containing
+        // block for position:fixed, which breaks dnd's coordinate calculations).
+        return snapshot.isDragging
+          ? createPortal(card, document.body)
+          : card;
+      }}
     </Draggable>
   );
 }
@@ -1602,6 +1640,25 @@ export default function KanbanBoard() {
 
     const newStatus = destination.droppableId as TaskStatus;
     const oldStatus = source.droppableId as TaskStatus;
+
+    if (newStatus === oldStatus) {
+      // Reorder within the same column — splice in the store array
+      const colTasks = tasksByStatus[newStatus];
+      const movedId = colTasks[source.index].id;
+      const targetId = colTasks[destination.index].id;
+      const newTasks = [...tasks];
+      const fromIdx = newTasks.findIndex((t) => t.id === movedId);
+      const toIdx = newTasks.findIndex((t) => t.id === targetId);
+      const [item] = newTasks.splice(fromIdx, 1);
+      newTasks.splice(toIdx, 0, item);
+      setTasks(newTasks);
+      // Persist order for all top-level tasks in this column (fire-and-forget)
+      const colOrdered = newTasks.filter((t) => t.status === newStatus && !t.parentTaskId);
+      colOrdered.forEach((t, i) => {
+        axios.put(`/api/tasks/${t.id}`, { order: i + 1 }).catch(() => {});
+      });
+      return;
+    }
 
     updateTask(draggableId, { status: newStatus });
 

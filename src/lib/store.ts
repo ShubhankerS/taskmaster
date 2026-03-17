@@ -45,6 +45,7 @@ export interface Task {
   projectId: string | null;
   project: Pick<Project, "id" | "name" | "color"> | null;
   parentTaskId: string | null;
+  order: number;
   subtasks?: Task[];
   _count?: { subtasks: number };
   tags?: TaskTag[];

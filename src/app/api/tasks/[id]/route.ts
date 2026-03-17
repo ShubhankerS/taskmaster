@@ -81,7 +81,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const { title, description, status, priority, dueDate, projectId, parentTaskId, recurrence } =
+    const { title, description, status, priority, dueDate, projectId, parentTaskId, recurrence, order } =
       parsed.data;
 
     // Validate projectId ownership if provided
@@ -110,6 +110,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         ...(projectId !== undefined ? { projectId: projectId ?? null } : {}),
         ...(parentTaskId !== undefined ? { parentTaskId: parentTaskId ?? null } : {}),
         ...(recurrence !== undefined ? { recurrence: recurrence ?? null } : {}),
+        ...(order !== undefined ? { order } : {}),
       },
       include: taskInclude,
     });

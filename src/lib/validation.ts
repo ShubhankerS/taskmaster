@@ -46,6 +46,7 @@ export const updateTaskSchema = z.object({
   projectId: z.string().nullable().optional(),
   parentTaskId: z.string().nullable().optional(),
   recurrence: recurrenceSchema,
+  order: z.number().int().optional(),
 });
 
 // ─── Project ──────────────────────────────────────────────────────────────────
