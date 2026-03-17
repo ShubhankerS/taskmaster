@@ -106,14 +106,6 @@ export default function WidgetGrid() {
             {isMobile ? "Widgets stacked for mobile" : "Drag widgets to rearrange"}
           </p>
         </div>
-        {!isMobile && (
-          <button
-            onClick={handleReset}
-            className="text-xs text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 border border-gray-700 px-3 py-1.5 rounded-lg transition-colors"
-          >
-            Reset Layout
-          </button>
-        )}
       </div>
 
       <ResponsiveGridLayout
