@@ -23,6 +23,7 @@ const mockTask = vi.hoisted(() => ({
   subtasks: [],
   tags: [],
   _count: { subtasks: 0 },
+  order: 0,
 }));
 
 // ─── Mock next-auth ────────────────────────────────────────────────────────────

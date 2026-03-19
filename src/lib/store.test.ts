@@ -21,6 +21,7 @@ function makeTask(overrides: Partial<Task> = {}): Task {
     parentTaskId: null,
     subtasks: [],
     _count: { subtasks: 0 },
+    order: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     ...overrides,
