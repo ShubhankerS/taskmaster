@@ -91,11 +91,6 @@ export default function WidgetGrid() {
     []
   );
 
-  function handleReset() {
-    setLayouts(DEFAULT_LAYOUTS);
-    saveLayouts(DEFAULT_LAYOUTS);
-  }
-
   return (
     <div className="w-full">
       {/* Top bar */}
