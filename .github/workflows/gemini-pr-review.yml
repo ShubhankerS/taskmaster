@@ -49,11 +49,8 @@ jobs:
 
           REVIEW=$(echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text')
 
+          BODY=$(printf '## Gemini PR Review\n\n%s\n\n---\n*Powered by Gemini Flash*' "$REVIEW")
+
           gh pr comment "$PR_NUMBER" \
             --repo "$REPO" \
-            --body "## 🤖 Gemini PR Review
-
-$REVIEW
-
----
-*Powered by Gemini Flash — not a substitute for human review*"
+            --body "$BODY"
