@@ -18,6 +18,7 @@ enum TaskStatus {
   TODO
   IN_PROGRESS
   DONE
+  WONT_DO
 }
 
 enum TaskPriority {

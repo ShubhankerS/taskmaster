@@ -5,7 +5,7 @@ import { z } from "zod";
 
 // ─── Task ─────────────────────────────────────────────────────────────────────
 
-export const taskStatusSchema = z.enum(["BACKLOG", "WILD_IDEA", "TODO", "IN_PROGRESS", "DONE"]);
+export const taskStatusSchema = z.enum(["BACKLOG", "WILD_IDEA", "TODO", "IN_PROGRESS", "DONE", "WONT_DO"]);
 export const taskPrioritySchema = z.enum(["LOW", "MEDIUM", "HIGH"]);
 export const recurrenceSchema = z
   .enum(["daily", "weekly", "monthly"])

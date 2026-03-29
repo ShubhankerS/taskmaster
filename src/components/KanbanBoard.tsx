@@ -33,6 +33,7 @@ const COLUMNS: { id: TaskStatus; label: string; dotColor: string; highlightColor
   { id: "TODO",        label: "To Do",       dotColor: "bg-blue-500",   highlightColor: "bg-blue-900/20"   },
   { id: "IN_PROGRESS", label: "In Progress", dotColor: "bg-yellow-500", highlightColor: "bg-yellow-900/20" },
   { id: "DONE",        label: "Done",        dotColor: "bg-green-500",  highlightColor: "bg-green-900/20"  },
+  { id: "WONT_DO",     label: "Won't Do",    dotColor: "bg-red-500",    highlightColor: "bg-red-900/20"    },
 ];
 
 // Status-based card left border color
@@ -42,6 +43,7 @@ const STATUS_BORDER_COLOR: Record<TaskStatus, string> = {
   TODO:        "border-l-blue-500",
   IN_PROGRESS: "border-l-yellow-500",
   DONE:        "border-l-green-500",
+  WONT_DO:     "border-l-red-500",
 };
 
 const STATUS_HEX: Record<TaskStatus, string> = {
@@ -50,6 +52,7 @@ const STATUS_HEX: Record<TaskStatus, string> = {
   TODO:        "#3b82f6",
   IN_PROGRESS: "#eab308",
   DONE:        "#22c55e",
+  WONT_DO:     "#ef4444",
 };
 
 const TAG_PALETTE = [
@@ -1267,7 +1270,11 @@ function BigIdeaCard({
 
               {/* Header row */}
               <div className="flex items-start justify-between gap-2 mb-1 pl-4">
-                <p className="text-sm font-medium text-white/90 leading-snug flex-1">
+                <p className={`text-sm font-medium leading-snug flex-1 ${
+                  task.status === "DONE" || task.status === "WONT_DO"
+                    ? "line-through text-white/30"
+                    : "text-white/90"
+                }`}>
                   {task.title}
                   {allSmallDone && totalSmall > 0 && (
                     <span className="ml-1.5 text-green-400 text-xs">✓</span>
@@ -1682,7 +1689,7 @@ export default function KanbanBoard() {
       acc[col.id] = filteredTasks.filter((t) => t.status === col.id);
       return acc;
     },
-    { BACKLOG: [], WILD_IDEA: [], TODO: [], IN_PROGRESS: [], DONE: [] }
+    { BACKLOG: [], WILD_IDEA: [], TODO: [], IN_PROGRESS: [], DONE: [], WONT_DO: [] }
   );
 
   if (tasksLoading) return <KanbanSkeleton />;

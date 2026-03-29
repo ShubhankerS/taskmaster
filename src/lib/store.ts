@@ -5,7 +5,7 @@ import { create } from "zustand";
 
 // ─── Domain Types ─────────────────────────────────────────────────────────────
 
-export type TaskStatus = "BACKLOG" | "WILD_IDEA" | "TODO" | "IN_PROGRESS" | "DONE";
+export type TaskStatus = "BACKLOG" | "WILD_IDEA" | "TODO" | "IN_PROGRESS" | "DONE" | "WONT_DO";
 export type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
 export type RecurrenceType = "daily" | "weekly" | "monthly" | null;
 
