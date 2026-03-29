@@ -81,9 +81,9 @@ export default function CalendarPage() {
     return () => es.close();
   }, [fetchTasks, setTasksLoading, hasFetched]);
 
-  // Build calendar events from tasks that have a due date
+  // Build calendar events from tasks that have a due date (exclude Won't Do)
   const events: CalendarEvent[] = tasks
-    .filter((t) => t.dueDate)
+    .filter((t) => t.dueDate && t.status !== "WONT_DO")
     .map((t) => {
       const due = new Date(t.dueDate!);
       return {
@@ -306,6 +306,7 @@ function CalendarTaskModal({
             <option value="TODO">To Do</option>
             <option value="IN_PROGRESS">In Progress</option>
             <option value="DONE">Done</option>
+            <option value="WONT_DO">Won&apos;t Do</option>
           </select>
         </div>
 

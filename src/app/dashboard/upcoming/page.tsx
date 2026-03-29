@@ -21,6 +21,7 @@ function statusDot(status: Task["status"]) {
     case "TODO":        return "bg-yellow-500";
     case "BACKLOG":     return "bg-gray-500";
     case "WILD_IDEA":   return "bg-purple-500";
+    case "WONT_DO":     return "bg-red-500";
     default:            return "bg-gray-500";
   }
 }
@@ -135,7 +136,7 @@ export default function UpcomingPage() {
 
   // Tasks with due dates, sorted soonest first
   const withDueDate = tasks
-    .filter((t) => t.dueDate && t.status !== "DONE")
+    .filter((t) => t.dueDate && t.status !== "DONE" && t.status !== "WONT_DO")
     .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
 
   const overdue = withDueDate.filter(

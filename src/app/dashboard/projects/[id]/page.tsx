@@ -16,6 +16,7 @@ const STATUS_LABELS: Record<TaskStatus, string> = {
   TODO:        "To Do",
   IN_PROGRESS: "In Progress",
   DONE:        "Done",
+  WONT_DO:     "Won't Do",
 };
 
 const PRIORITY_COLORS: Record<TaskPriority, string> = {
@@ -33,6 +34,7 @@ function TaskRow({ task }: { task: Task }) {
   const isOverdue =
     task.dueDate &&
     task.status !== "DONE" &&
+    task.status !== "WONT_DO" &&
     new Date(task.dueDate) < new Date();
 
   return (
@@ -151,11 +153,12 @@ export default function ProjectDetailPage() {
       ? project.tasks
       : project.tasks.filter((t) => t.status === statusFilter);
 
+  const activeTasks = project.tasks.filter((t) => t.status !== "WONT_DO");
   const taskStats = {
-    total: project.tasks.length,
-    done: project.tasks.filter((t) => t.status === "DONE").length,
-    inProgress: project.tasks.filter((t) => t.status === "IN_PROGRESS").length,
-    todo: project.tasks.filter((t) => t.status === "TODO").length,
+    total: activeTasks.length,
+    done: activeTasks.filter((t) => t.status === "DONE").length,
+    inProgress: activeTasks.filter((t) => t.status === "IN_PROGRESS").length,
+    todo: activeTasks.filter((t) => t.status === "TODO").length,
   };
 
   const completionPercent =

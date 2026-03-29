@@ -58,7 +58,7 @@ export default function AnalyticsWidget() {
     (t) => t.status === "IN_PROGRESS" && !t.parentTaskId
   ).length;
 
-  const totalBigIdeas = tasks.filter((t) => !t.parentTaskId).length;
+  const totalBigIdeas = tasks.filter((t) => !t.parentTaskId && t.status !== "WONT_DO").length;
   const doneBigIdeas = tasks.filter(
     (t) => !t.parentTaskId && t.status === "DONE"
   ).length;
